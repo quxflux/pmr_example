@@ -13,13 +13,14 @@ namespace
 {
   namespace qf = quxflux;
 
-  template<typename StorageType, typename Duration = std::chrono::milliseconds>
-  auto smooth(const qf::tri_mesh& mesh, const std::filesystem::path& output_path)
+  template<typename AllocationStrategy, typename Duration = std::chrono::milliseconds>
+  auto smooth(const qf::tri_mesh& mesh, const AllocationStrategy& allocation_strategy,
+              const std::filesystem::path& output_path)
   {
     const auto copy = mesh.clone();
 
     const auto start = std::chrono::high_resolution_clock::now();
-    qf::laplacian_smoothing<StorageType>(*copy.get(), 10);
+    qf::laplacian_smoothing(*copy.get(), 10, allocation_strategy);
     const auto dur = std::chrono::duration_cast<Duration>(std::chrono::high_resolution_clock::now() - start);
     // exclude IO from measurement
     qf::write_to_file(*copy.get(), output_path);
@@ -49,9 +50,9 @@ int main()
   qf::write_to_file(*sphere.get(), "noisy_sphere.obj");
 
   std::cout << "impl with std::vector took "
-            << smooth<qf::allocation_strategy::use_vector>(*sphere.get(), "smoothed_sphere_0.obj") << '\n';
+            << smooth(*sphere.get(), qf::allocation_strategy::use_vector, "smoothed_sphere_0.obj") << '\n';
   std::cout << "impl with std::pmr::vector took "
-            << smooth<qf::allocation_strategy::use_pmr_vector>(*sphere.get(), "smoothed_sphere_2.obj") << '\n';
+            << smooth(*sphere.get(), qf::allocation_strategy::use_pmr_vector, "smoothed_sphere_2.obj") << '\n';
 
   return EXIT_SUCCESS;
 }

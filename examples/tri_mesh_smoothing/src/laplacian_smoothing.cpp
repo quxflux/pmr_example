@@ -38,7 +38,7 @@ namespace quxflux
         return smoothed;
       };
 
-      if constexpr (std::same_as<AllocationStrategy, allocation_strategy::use_vector>)
+      if constexpr (std::same_as<AllocationStrategy, allocation_strategy::detail::use_vector_t>)
       {
         // naive implementation:
         // create a regular vector each time the function is called, resulting in a heap allocation
@@ -46,7 +46,7 @@ namespace quxflux
         std::vector<vertex_index> neighbor_indices(n);
         mesh.get_vertex_neighbors(i, neighbor_indices.data(), n);
         return calculate_smoothed(neighbor_indices);
-      } else if constexpr (std::same_as<AllocationStrategy, allocation_strategy::use_pmr_vector>)
+      } else if constexpr (std::same_as<AllocationStrategy, allocation_strategy::detail::use_pmr_vector_t>)
       {
         // optimized implementation using std::pmr::vector:
         // use a monotonic_buffer_resource with a preallocated stack-based buffer which holds space for
@@ -61,7 +61,7 @@ namespace quxflux
   }  // namespace
 
   template<typename AllocationStrategy>
-  void laplacian_smoothing(tri_mesh& mesh, const size_t num_iterations)
+  void laplacian_smoothing(tri_mesh& mesh, const size_t num_iterations, const AllocationStrategy&)
   {
     const size_t n = mesh.get_num_vertices();
     std::vector<vec3f> org_vertices(n);
@@ -75,6 +75,9 @@ namespace quxflux
     }
   }
 
-  template void laplacian_smoothing<allocation_strategy::use_vector>(tri_mesh&, size_t);
-  template void laplacian_smoothing<allocation_strategy::use_pmr_vector>(tri_mesh&, size_t);
+  template void laplacian_smoothing<allocation_strategy::detail::use_vector_t>  //
+    (tri_mesh&, size_t, const allocation_strategy::detail::use_vector_t&);
+
+  template void laplacian_smoothing<allocation_strategy::detail::use_pmr_vector_t>  //
+    (tri_mesh&, size_t, const allocation_strategy::detail::use_pmr_vector_t&);
 }  // namespace quxflux
