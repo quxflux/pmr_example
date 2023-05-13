@@ -40,11 +40,17 @@ namespace quxflux
 
       if constexpr (std::same_as<AllocationStrategy, allocation_strategy::use_vector>)
       {
+        // naive implementation:
+        // create a regular vector each time the function is called, resulting in a heap allocation
+        // each time
         std::vector<vertex_index> neighbor_indices(n);
         mesh.get_vertex_neighbors(i, neighbor_indices.data(), n);
         return calculate_smoothed(neighbor_indices);
       } else if constexpr (std::same_as<AllocationStrategy, allocation_strategy::use_pmr_vector>)
       {
+        // optimized implementation using std::pmr::vector:
+        // use a monotonic_buffer_resource with a preallocated stack-based buffer which holds space for
+        // 6 vertices (which should be sufficient for most vertices).
         std::array<std::byte, sizeof(vertex_index) * 6> static_storage;
         std::pmr::monotonic_buffer_resource buf_resource{static_storage.data(), static_storage.size()};
         std::pmr::vector<vertex_index> neighbor_indices(n, &buf_resource);

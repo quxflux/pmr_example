@@ -27,7 +27,6 @@ namespace
   private:
     void* do_allocate(size_t n_bytes, size_t alignment) final
     {
-      std::cout << n_bytes << std::endl;
       ++statistics_.n_allocations;
       statistics_.n_bytes_allocated += n_bytes;
       return upstream_resource_->allocate(n_bytes, alignment);

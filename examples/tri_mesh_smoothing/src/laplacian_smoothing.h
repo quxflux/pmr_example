@@ -12,7 +12,6 @@ namespace quxflux
     // clang-format on
   }  // namespace allocation_strategy
 
-
   template<typename AllocationStrategy>
   void laplacian_smoothing(tri_mesh& mesh, const size_t iterations);
 }  // namespace quxflux
