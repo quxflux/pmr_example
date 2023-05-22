@@ -10,3 +10,4 @@ set_project_warnings(base_project)
 
 add_subdirectory(examples/mem_resource_chaining)
 add_subdirectory(examples/tri_mesh_smoothing)
+add_subdirectory(examples/allocator_aware_object)
