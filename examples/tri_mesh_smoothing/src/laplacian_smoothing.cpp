@@ -13,7 +13,7 @@ namespace quxflux
   {
     vec3f get_vertex(const tri_mesh& mesh, const vertex_index i)
     {
-      std::array<float, 3> vertex{};
+      vec3f vertex{};
       mesh.get_vertex(i, vertex.data());
       return vertex;
     }
@@ -29,7 +29,7 @@ namespace quxflux
       const auto calculate_smoothed = [&](const std::span<const vertex_index> neighbor_indices) {
         vec3f smoothed{};
 
-        for (auto vi : neighbor_indices)
+        for (const auto vi : neighbor_indices)
           std::ranges::transform(smoothed, org_vertices[vi], smoothed.begin(), std::plus<>{});
 
         const auto n_recip = 1.f / static_cast<float>(n);
