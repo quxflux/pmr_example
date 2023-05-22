@@ -12,7 +12,7 @@ namespace
 {
   void print(const std::string_view prefix, const std::span<const std::byte> data)
   {
-    std::cout << prefix;
+    std::cout << prefix << ":";
     std::ranges::copy(data                                                        //
                         | std::views::transform(&std::to_integer<unsigned char>)  //
                         | std::views::transform([](const auto c) -> char { return std::isprint(c) ? c : '#'; }),
@@ -29,15 +29,14 @@ namespace
   {
     using allocator_type = std::pmr::polymorphic_allocator<>;
 
-    product_pmr_alloc_aware() = default;
-    product_pmr_alloc_aware(const product_pmr_alloc_aware&) = default;
-    product_pmr_alloc_aware(product_pmr_alloc_aware&&) = default;
-
-    explicit product_pmr_alloc_aware(const allocator_type& alloc) : name(alloc) {}
-    explicit product_pmr_alloc_aware(const std::string_view s, const allocator_type& alloc = {}) : name(s, alloc) {}
-    product_pmr_alloc_aware(const product_pmr_alloc_aware& other, const allocator_type& alloc) : name(other.name, alloc)
+    constexpr product_pmr_alloc_aware(const allocator_type& alloc = {}) : name(alloc) {}
+    explicit constexpr product_pmr_alloc_aware(const std::string_view s, const allocator_type& alloc = {})
+      : name(s, alloc)
     {}
-    product_pmr_alloc_aware(product_pmr_alloc_aware&& other, const allocator_type& alloc)
+    explicit constexpr product_pmr_alloc_aware(const product_pmr_alloc_aware& other, const allocator_type& alloc = {})
+      : name(other.name, alloc)
+    {}
+    explicit constexpr product_pmr_alloc_aware(product_pmr_alloc_aware&& other, const allocator_type& alloc = {})
       : name(std::move(other.name), alloc){};
 
     std::pmr::string name;
